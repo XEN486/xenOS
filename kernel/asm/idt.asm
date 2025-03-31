@@ -30,6 +30,7 @@
 idt_apply:
     mov eax, [esp + 4]
     lidt [eax]
+    sti ; not sure if this is necessary
     ret
 
 isr_common_stub:
