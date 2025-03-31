@@ -2,20 +2,24 @@ NASM = nasm
 CC = i686-elf-gcc
 LD = i686-elf-ld
 
+XORRISO = xorriso
+
+QEMU = qemu-system-x86_64
+BOCHS = bochs
+
 CFLAGS = -O2 -c -ffreestanding -Ikernel/inc/
 LDFLAGS = -n -T linker.ld
 
 ISO_DIR = isofiles/boot
 BUILD_DIR = build
 
-XORRISO = xorriso
+ASM_SOURCES := $(shell find boot kernel/asm -type f -name "*.asm")
+C_SOURCES := $(shell find kernel/src -type f -name "*.c")
 
-ASM_SOURCES := $(wildcard boot/*.asm kernel/asm/*.asm kernel/asm/**/*.asm)
-C_SOURCES := $(wildcard kernel/src/*.c kernel/src/**/*.c)
+ASM_OBJECTS := $(ASM_SOURCES:%.asm=$(BUILD_DIR)/%.o)
+C_OBJECTS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
 
-ASM_OBJECTS := $(patsubst %, $(BUILD_DIR)/%, $(ASM_SOURCES:%.asm=%.o))
-C_OBJECTS := $(patsubst kernel/src/%, $(BUILD_DIR)/kernel/src/%, $(C_SOURCES:%.c=%.o))
-OBJECTS = $(ASM_OBJECTS) $(C_OBJECTS)
+OBJECTS := $(ASM_OBJECTS) $(C_OBJECTS)
 
 all: kernel.bin createiso
 
@@ -41,5 +45,10 @@ createiso:
 	cat isofiles/boot/grub/i386-pc/cdboot.img core.img > isofiles/boot/grub/boot.img
 	$(XORRISO) -as mkisofs -R -J -b boot/grub/boot.img -no-emul-boot -boot-load-size 4 -boot-info-table -o os.iso isofiles
 
-run: all
-	qemu-system-x86_64 -boot d -cdrom os.iso
+qemu:
+	$(QEMU) -boot d -cdrom os.iso
+
+bochs:
+	$(BOCHS) -f bochsrc.bxrc -q
+
+run: all qemu
