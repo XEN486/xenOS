@@ -6,7 +6,6 @@ uint32_t tick = 0;
 
 static void timer_callback(int_registers_t* regs) {
     tick++;
-    terminal_write("linux ");
 }
 
 void timer_init(uint32_t freq) {
