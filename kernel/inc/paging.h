@@ -2,7 +2,6 @@
 #define PAGING_H
 
 #include <common.h>
-#include <heap.h>
 #include <idt.h>
 
 typedef struct {

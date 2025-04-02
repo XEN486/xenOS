@@ -50,4 +50,7 @@ void terminal_write_size(const char* data, size_t size);
 // Writes a c-style string to the terminal.
 void terminal_write(const char* data);
 
+// Writes a padded 32-bit number to the terminal in hex.
+void terminal_write_hex(uint32_t data);
+
 #endif

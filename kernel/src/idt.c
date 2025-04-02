@@ -1,5 +1,6 @@
 #include <idt.h>
 #include <string.h>
+#include <terminal.h>
 
 extern void idt_apply(uint32_t);
 
@@ -9,7 +10,13 @@ idt_ptr_t idt_ptr;
 isr_t handlers[256];
 
 void isr_handler(int_registers_t* regs) {
-	;
+	if (handlers[regs->int_no] != 0) {
+        handlers[regs->int_no](regs);
+    } else {
+        terminal_clear();
+        terminal_write("!!! UNHANDLED INTERRUPT !!!");
+        while (true) {}
+    }
 }
 
 void irq_handler(int_registers_t* regs) {

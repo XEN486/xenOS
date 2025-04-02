@@ -1,6 +1,5 @@
-#include "timer.h"
-#include "idt.h"
-#include "terminal.h"
+#include <timer.h>
+#include <idt.h>
 
 uint32_t tick = 0;
 
@@ -10,7 +9,7 @@ static void timer_callback(int_registers_t* regs) {
 
 void timer_init(uint32_t freq) {
     // register the timer callback.
-    register_int_handler(IRQ0, &timer_callback);
+    register_int_handler(IRQ0, timer_callback);
 
     // find frequency divisor.
     uint32_t divisor = 1193180 / freq;
