@@ -24,11 +24,11 @@ OBJECTS := $(ASM_OBJECTS) $(C_OBJECTS)
 all: kernel.bin createiso
 
 $(BUILD_DIR)/%.o: %.asm
-	@mkdir -p $(dir $@)   
+	@mkdir -p $(dir $@)
 	$(NASM) -f elf32 $< -o $@
 
 $(BUILD_DIR)/kernel/src/%.o: kernel/src/%.c
-	@mkdir -p $(dir $@)   
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $< -o $@
 
 kernel.bin: $(OBJECTS)

@@ -1,6 +1,6 @@
 #include <idt.h>
-#include <string.h>
 #include <terminal.h>
+#include <memory.h>
 
 extern void idt_apply(uint32_t);
 

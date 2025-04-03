@@ -2,9 +2,12 @@
 #include <terminal.h>
 #include <string.h>
 #include <panic.h>
+#include <memory.h>
 
 uint32_t* frames;
 uint32_t nframes;
+
+extern uint32_t placement_address;
 
 // The kernel's page directory.
 page_directory_t* kernel_directory = NULL;
@@ -101,21 +104,25 @@ void paging_init() {
 
     // initialize frames and nframes.
     nframes = mem_end_page / 0x1000;
-    frames = (uint32_t*)kmalloc(INDEX_FROM_BIT(nframes), NULL);
+    frames = (uint32_t*)kmalloc(INDEX_FROM_BIT(nframes));
     memset(frames, 0, INDEX_FROM_BIT(nframes));
 
     // create the kernel's page directory.
-    kernel_directory = (page_directory_t*)kmalloc(sizeof(page_directory_t), NULL);
+    kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
     memset(kernel_directory, 0, sizeof(page_directory_t));
     current_directory = kernel_directory;
 
     // identity map from 0x0 -> end of used memory.
-    for (size_t i = 0; i < HEAP_START + HEAP_INITIAL_SIZE; i += 0x1000) {
+    //for (size_t i = 0; i < HEAP_START + HEAP_INITIAL_SIZE; i += 0x1000) {
+    size_t i = 0;
+    while (i < placement_address) {
         // get the page.
         page_t* page = paging_get_page(i, true, kernel_directory);
 
         // allocate the frame to be readable but not writable by userspace.
         alloc_frame(page, false, false);
+
+        i += 0x1000;
     }
 
     // register the page fault handler.
@@ -147,7 +154,7 @@ page_t* paging_get_page(uint32_t address, bool create, page_directory_t* directo
         uint32_t tmp;
         
         // allocate memory for the new page table, tmp -> physical address
-        directory->tables[table_idx] = (page_table_t*)kmalloc(sizeof(page_table_t), &tmp);
+        directory->tables[table_idx] = (page_table_t*)kmalloc_ap(sizeof(page_table_t), &tmp);
 
         // zero out the page table
         memset(directory->tables[table_idx], 0, 0x1000);

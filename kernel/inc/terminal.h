@@ -38,11 +38,14 @@ void terminal_init();
 // Clears the terminal.
 void terminal_clear();
 
+// Gets the current terminal colour.
+uint8_t terminal_get_colour();
+
 // Sets the current terminal colour.
 void terminal_set_colour(uint8_t colour);
 
 // Writes a character to the terminal.
-void terminal_put(char c);
+void terminal_put(uint8_t c);
 
 // Writes a string to the terminal, with a size.
 void terminal_write_size(const char* data, size_t size);
@@ -52,5 +55,11 @@ void terminal_write(const char* data);
 
 // Writes a padded 32-bit number to the terminal in hex.
 void terminal_write_hex(uint32_t data);
+
+// Draws a box to the screen.
+void terminal_box(int x, int y, int width, int height);
+
+// Moves the cursor to a specific location.
+void terminal_move(int x, int y);
 
 #endif

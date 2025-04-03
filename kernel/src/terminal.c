@@ -1,12 +1,20 @@
 #include <terminal.h>
+#include <memory.h>
 #include <string.h>
+
+#define TL_CORNER  0xC9  // ╔
+#define TR_CORNER  0xBB  // ╗
+#define BL_CORNER  0xC8  // ╚
+#define BR_CORNER  0xBC  // ╝
+#define HORIZONTAL 0xCD  // ═
+#define VERTICAL   0xBA  // ║
 
 size_t terminal_row;
 size_t terminal_column;
 uint8_t terminal_colour;
 volatile uint16_t* vga_buffer = (uint16_t*)0xB8000;
 
-static inline uint16_t vga_entry(char character, uint8_t colour) {
+static inline uint16_t vga_entry(uint8_t character, uint8_t colour) {
     return (uint16_t)character | ((uint16_t)colour << 8);
 }
 
@@ -19,11 +27,11 @@ static void terminal_update_cursor() {
     outb(0x3D5, (uint8_t)(index & 0xFF));
 }
 
-static void terminal_write_entry_index(char c, uint8_t colour, size_t index) {
+static void terminal_write_entry_index(uint8_t c, uint8_t colour, size_t index) {
     vga_buffer[index] = vga_entry(c, colour);
 }
 
-static void terminal_write_entry(char c, uint8_t colour, size_t x, size_t y) {
+static void terminal_write_entry(uint8_t c, uint8_t colour, size_t x, size_t y) {
     const size_t index = y * TERM_WIDTH + x;
     terminal_write_entry_index(c, colour, index);
 }
@@ -50,11 +58,15 @@ void terminal_clear() {
 	terminal_row = 0;
 }
 
+uint8_t terminal_get_colour() {
+    return terminal_colour;
+}
+
 void terminal_set_colour(uint8_t colour) {
     terminal_colour = colour;
 }
 
-bool terminal_handle_control(char c) {
+bool terminal_handle_control(uint8_t c) {
 	if (c == '\n') {
 		terminal_column = 0;
 		terminal_row += 1;
@@ -76,7 +88,7 @@ bool terminal_handle_control(char c) {
 	return true;
 }
 
-void terminal_put(char c) {
+void terminal_put(uint8_t c) {
     if (!terminal_handle_control(c)) {
 		terminal_write_entry(c, terminal_colour, terminal_column, terminal_row);
 
@@ -118,5 +130,35 @@ void terminal_write_hex(uint32_t data) {
 void terminal_init() {
     terminal_set_colour(VGA_COLOUR(LIGHT_GREY, BLACK));
     terminal_clear();
+    terminal_update_cursor();
+}
+
+void terminal_box(int x, int y, int width, int height) {
+    terminal_move(x, y);
+    
+    terminal_put(TL_CORNER);
+    for (size_t i = 0; i < width - 2; i++) {
+        terminal_put(HORIZONTAL);
+    }
+    terminal_put(TR_CORNER);
+
+    for (size_t i = 0; i < height; i++) {
+        terminal_put(VERTICAL);
+        for (size_t i = 0; i < width - 2; i++) {
+            terminal_put(' ');
+        }
+        terminal_put(VERTICAL);
+    }
+
+    terminal_put(BL_CORNER);
+    for (size_t i = 0; i < width - 2; i++) {
+        terminal_put(HORIZONTAL);
+    }
+    terminal_put(BR_CORNER);
+}
+
+void terminal_move(int x, int y) {
+    terminal_column = x;
+    terminal_row = y;
     terminal_update_cursor();
 }
