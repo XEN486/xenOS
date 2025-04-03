@@ -1,23 +1,46 @@
 #include <memory.h>
 #include <common.h>
+#include <heap.h>
+#include <paging.h>
+#include <terminal.h>
 
 extern uint32_t end;
 uint32_t placement_address = (uint32_t)&end;
 
-uint32_t kmalloc_i(size_t size, bool align, uint32_t* phys) {
-    if (align == true && (placement_address & 0x00000FFF)) {
-        placement_address &= 0xFFFFF000;
-        placement_address += 0x1000;
-    }
+extern page_directory_t* kernel_directory;
+extern heap_t* kernel_heap;
 
-    if (phys) {
-        *phys = placement_address;
-    }
-
-    uint32_t tmp = placement_address;
-    placement_address += size;
-    return tmp;
+void kfree(void* p) {
+	heap_free(p, kernel_heap);
 }
+
+uint32_t kmalloc_i(size_t size, bool align, uint32_t* phys) {
+	if (kernel_heap != 0) {
+		void* addr = heap_alloc(size, align, kernel_heap);
+		if (phys != NULL) {
+			page_t* page = paging_get_page((uint32_t)addr, false, kernel_directory);
+			*phys = page->frame * 0x1000 + (uint32_t)addr & 0xFFF;
+		}
+
+		return (uint32_t)addr;
+	}
+
+	else {
+		if (align == true && (placement_address & 0x00000FFF)) {
+			placement_address &= 0xFFFFF000;
+			placement_address += 0x1000;
+		}
+	
+		if (phys) {
+			*phys = placement_address;
+		}
+	
+		uint32_t tmp = placement_address;
+		placement_address += size;
+		return tmp;
+	}
+}
+
 uint32_t kmalloc(size_t size) {
     return kmalloc_i(size, false, NULL);
 

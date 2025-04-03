@@ -6,15 +6,13 @@
 #include <paging.h>
 #include <keyboard.h>
 #include <panic.h>
+#include <memory.h>
 
 void print_key(uint8_t scancode, uint8_t ascii, uint8_t modifiers) {
+	//terminal_write_hex(scancode);
 	if (ascii != 0 && (modifiers & CTRL_PRESSED) == 0) {
 		terminal_put(ascii);
 	}
-}
-
-void test_handler() {
-	terminal_write("Hello this is from my notification handler\n");
 }
 
 void kmain(unsigned long magic, unsigned long addr) {
@@ -22,14 +20,33 @@ void kmain(unsigned long magic, unsigned long addr) {
 	gdt_init();
 	idt_init();
 	timer_init(50);
-	notify("Test Notification", "This is a test of the new notification system.", test_handler);
 
+	uint32_t a = kmalloc(8);
 	paging_init();
-	keyboard_init();
+	uint32_t b = kmalloc(8);
+	uint32_t c = kmalloc(8);
+
+	//keyboard_init();
+	//register_key_handler(print_key);
+
+	terminal_write("a: ");
+	terminal_write_hex(a);
+
+	terminal_write(", b: ");
+	terminal_write_hex(b);
+
+	terminal_write("\nc: ");
+	terminal_write_hex(c);
+
+	kfree(c);
+	kfree(b);
+
+	uint32_t d = kmalloc(12);
+	terminal_write(", d: ");
+	terminal_write_hex(d);
 
 	//uint32_t* unmapped = (uint32_t*)0xdeadbeef;
 	//terminal_put(*unmapped);
 
-	register_key_handler(print_key);
 	while (true) {}
 }

@@ -33,7 +33,10 @@ void paging_switch_directory(page_directory_t* new_directory);
 // Retrieves a pointer to the page. If the "create" boolean is true, and the page table isn't created, create it.
 page_t* paging_get_page(uint32_t address, bool create, page_directory_t* directory);
 
-// Handles a page fault.
-void paging_page_fault(int_registers_t* regs);
+// Allocates a frame.
+void paging_alloc_frame(page_t* page, bool kernel, bool writable);
+
+// Frees a frame.
+void paging_free_frame(page_t* page);
 
 #endif

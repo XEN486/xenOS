@@ -3,11 +3,13 @@
 #include <string.h>
 #include <panic.h>
 #include <memory.h>
+#include <heap.h>
 
 uint32_t* frames;
 uint32_t nframes;
 
 extern uint32_t placement_address;
+extern heap_t* kernel_heap;
 
 // The kernel's page directory.
 page_directory_t* kernel_directory = NULL;
@@ -25,6 +27,24 @@ static void set_frame(uint32_t frame_addr) {
     uint32_t off = OFFSET_FROM_BIT(frame);
 
     frames[idx] |= (0x1 << off);
+}
+
+// clears a bit in the frames bitset.
+void clear_frame(uint32_t frame_addr) {
+    uint32_t frame = frame_addr / 0x1000;
+    uint32_t idx = INDEX_FROM_BIT(frame);
+    uint32_t off = OFFSET_FROM_BIT(frame);
+
+    frames[idx] &= ~(0x1 << off);
+}
+
+// tests a bit in the frames bitset.
+static uint32_t test_frame(uint32_t frame_addr) {
+    uint32_t frame = frame_addr / 0x1000;
+    uint32_t idx = INDEX_FROM_BIT(frame);
+    uint32_t off = OFFSET_FROM_BIT(frame);
+
+    return (frames[idx] & (0x1 << off));
 }
 
 // finds the first free frame.
@@ -60,8 +80,7 @@ static void enable_paging() {
     __asm__ volatile("mov %0, %%cr0" :: "r"(cr0));
 }
 
-// allocates a frame.
-static void alloc_frame(page_t* page, bool kernel, bool writable) {
+void paging_alloc_frame(page_t* page, bool kernel, bool writable) {
     // exit if the frame was already allocated.
     if (page->frame != 0) {
         return;
@@ -72,7 +91,7 @@ static void alloc_frame(page_t* page, bool kernel, bool writable) {
 
     // panic if there are no free frames.
     if (idx == UINT32_MAX) {
-        panic("No free frames", "No more free frames are left to allocate.", NULL);
+        PANIC("No free frames", "No more free frames are left to allocate.", NULL);
     }
 
     // set the frame in the bitset and mark the page as present.
@@ -87,15 +106,28 @@ static void alloc_frame(page_t* page, bool kernel, bool writable) {
     page->frame = idx;
 }
 
+void paging_free_frame(page_t* page) {
+    uint32_t frame;
+
+    if (!(frame=page->frame)) {
+        return;
+    }
+    
+    else {
+        clear_frame(frame);
+        page->frame = 0x0;
+    }
+}
+
 void page_fault_panic_handler() {
     uint32_t faulting_address;
-    __asm__("mov %%cr2, %0" : "=r" (faulting_address));
+    __asm__ ("mov %%cr2, %0" : "=r" (faulting_address));
 
     terminal_write_hex(faulting_address);
 }
 
 void paging_page_fault(int_registers_t* regs) {
-    panic("Page fault", "The faulting address is written in \"Additional Information\".", page_fault_panic_handler);
+    PANIC("Page fault", "The faulting address is written in \"Additional Information\".", page_fault_panic_handler);
 }
 
 void paging_init() {
@@ -112,17 +144,24 @@ void paging_init() {
     memset(kernel_directory, 0, sizeof(page_directory_t));
     current_directory = kernel_directory;
 
-    // identity map from 0x0 -> end of used memory.
-    //for (size_t i = 0; i < HEAP_START + HEAP_INITIAL_SIZE; i += 0x1000) {
+    // create page tables when necessary, but dont allocate the frames
     size_t i = 0;
-    while (i < placement_address) {
-        // get the page.
-        page_t* page = paging_get_page(i, true, kernel_directory);
-
+    for (i = HEAP_START; i < HEAP_START + HEAP_INITIAL_SIZE; i += 0x1000)
+        paging_get_page(i, true, kernel_directory);
+    
+    // identity map from 0x0 -> end of used memory.
+    i = 0;
+    while (i < placement_address + 0x1000) {
         // allocate the frame to be readable but not writable by userspace.
-        alloc_frame(page, false, false);
+        paging_alloc_frame(paging_get_page(i, true, kernel_directory), false, false);
 
+        // increment i
         i += 0x1000;
+    }
+
+    // allocate the frames that we mapped previously.
+    for (i = HEAP_START; i < HEAP_START + HEAP_INITIAL_SIZE; i += 0x1000) {
+        paging_alloc_frame(paging_get_page(i, true, kernel_directory), false, false);
     }
 
     // register the page fault handler.
@@ -131,6 +170,9 @@ void paging_init() {
     // enable paging!
     paging_switch_directory(kernel_directory);
     enable_paging();
+
+    // create the kernel heap
+    kernel_heap = heap_create(HEAP_START, HEAP_START + HEAP_INITIAL_SIZE, 0xCFFFF000, false, false);
 }
 
 void paging_switch_directory(page_directory_t* new_directory) {

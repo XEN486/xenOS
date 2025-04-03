@@ -62,4 +62,7 @@ void terminal_box(int x, int y, int width, int height);
 // Moves the cursor to a specific location.
 void terminal_move(int x, int y);
 
+// Writes a 32-bit number to the terminal in decimal.
+void terminal_write_dec(uint32_t data);
+
 #endif

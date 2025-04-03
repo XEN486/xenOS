@@ -3,6 +3,8 @@
 
 #include <common.h>
 
+void kfree(void* p);
+
 uint32_t kmalloc(size_t size);
 uint32_t kmalloc_a(size_t size);
 uint32_t kmalloc_p(size_t size, uint32_t* phys);

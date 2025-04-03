@@ -1,5 +1,6 @@
 #include <ordered_array.h>
 #include <memory.h>
+#include <panic.h>
 
 bool std_lessthan_predicate(type_t a, type_t b) {
     return (a < b) ? true : false;
@@ -36,6 +37,8 @@ void destroy_ordered_array(ordered_array_t* array) {
 }
 
 void insert_ordered_array(type_t item, ordered_array_t* array) {
+    assert(array->lessthan, "", "");
+
     size_t iterator = 0;
     while (iterator < array->size && array->lessthan(array->array[iterator], item))
         iterator++;
@@ -60,6 +63,7 @@ void insert_ordered_array(type_t item, ordered_array_t* array) {
 }
 
 type_t lookup_ordered_array(size_t i, ordered_array_t* array) {
+    assert(i < array->size, "", "");
     return array->array[i];
 }
 

@@ -1,10 +1,9 @@
 #include <panic.h>
-#include <common.h>
 #include <terminal.h>
 
 extern void hang();
 
-void panic(const char* error, const char* description, panic_handler_t handler) {
+void panic(const char* error, const char* description, const char* file, int line, panic_handler_t handler) {
     uint32_t eax, ebx, ecx, edx, esi, edi, ebp, esp;
     
     // read all the current registers
@@ -22,7 +21,7 @@ void panic(const char* error, const char* description, panic_handler_t handler) 
     );
 
     // clear the screen
-    terminal_clear();
+    //terminal_clear();
 
     // "Error: "
     terminal_set_colour(VGA_COLOUR(RED, BLACK));
@@ -39,6 +38,17 @@ void panic(const char* error, const char* description, panic_handler_t handler) 
     // show description
     terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
     terminal_write(description);
+
+    // "Where: "
+    terminal_set_colour(VGA_COLOUR(RED, BLACK));
+    terminal_write("\nWhere:       ");
+
+    // file(line)
+    terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
+    terminal_write(file);
+    terminal_write("(");
+    terminal_write_dec(line);
+    terminal_write(").");
 
     // EAX
     terminal_write("\n\n        EAX: ");
@@ -91,7 +101,7 @@ void notify(const char* error, const char* description, panic_handler_t handler)
 
     // draw a box
     terminal_set_colour(VGA_COLOUR(LIGHT_BLUE, BLACK));
-    terminal_box(0, 0, 80, 3);
+    terminal_box(0, 0, 80, 2);
 
     // "Kernel Notification: "
     terminal_set_colour(VGA_COLOUR(LIGHT_CYAN, BLACK));
@@ -112,7 +122,7 @@ void notify(const char* error, const char* description, panic_handler_t handler)
     terminal_write(description);
 
     // move outside of the box
-    terminal_move(0, 5);
+    terminal_move(0, 4);
 
     // call any additional handlers
     if (handler != NULL) {
@@ -121,9 +131,15 @@ void notify(const char* error, const char* description, panic_handler_t handler)
         terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
 
         handler();
+        terminal_put('\n');
     }
 
-    // return the terminal colour and skip a line.
+    // return the terminal colour.
     terminal_set_colour(old_colour);
-    terminal_put('\n');
+}
+
+void assert(bool condition, const char* error, const char* description) {
+    if (!condition) {
+        notify(error, description, NULL);
+    }
 }
