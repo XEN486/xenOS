@@ -164,27 +164,16 @@ void terminal_move(int x, int y) {
 }
 
 void terminal_write_dec(uint32_t data) {
-    if (data == 0) {
-        terminal_put('0');
-        return;
-    }
+    char buf[11];
+    char *p = &buf[sizeof(buf) - 1];
+    *p = '\0';
 
-    char dec_str[11]; // max digits for a 32-bit unsigned integer (10 digits + null terminator)
-    int i = 0;
+    uint32_t value = data;
 
-    // Convert the number to a string
-    while (data > 0) {
-        dec_str[i++] = '0' + (data % 10);
-        data /= 10;
-    }
-    dec_str[i] = '\0';
+    do {
+        *(--p) = "0123456789"[value % 10];
+        value = value / 10;
+    } while (value);
 
-    // Reverse the string
-    for (int j = 0; j < i / 2; j++) {
-        char temp = dec_str[j];
-        dec_str[j] = dec_str[i - j - 1];
-        dec_str[i - j - 1] = temp;
-    }
-
-    terminal_write(dec_str); // Write the string to the terminal
+    terminal_write(p);
 }
