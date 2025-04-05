@@ -21,7 +21,7 @@ C_OBJECTS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
 
 OBJECTS := $(ASM_OBJECTS) $(C_OBJECTS)
 
-all: kernel.bin createiso
+all: createiso
 
 $(BUILD_DIR)/%.o: %.asm
 	@mkdir -p $(dir $@)
@@ -40,7 +40,7 @@ clean:
 	rm -f kernel.bin os.iso
 	rm -f bochslog.txt
 
-createiso:
+createiso: kernel.bin
 	cp kernel.bin $(ISO_DIR)
 	cat isofiles/boot/grub/i386-pc/cdboot.img core.img > isofiles/boot/grub/boot.img
 	$(XORRISO) -as mkisofs -R -J -b boot/grub/boot.img -no-emul-boot -boot-load-size 4 -boot-info-table -o os.iso isofiles
