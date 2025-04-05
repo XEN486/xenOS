@@ -50,5 +50,3 @@ qemu:
 
 bochs:
 	$(BOCHS) -f bochsrc.bxrc -q
-
-run: all qemu
