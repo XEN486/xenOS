@@ -57,10 +57,10 @@ void terminal_write(const char* data);
 void terminal_write_hex(uint32_t data);
 
 // Draws a box to the screen.
-void terminal_box(int x, int y, int width, int height);
+void terminal_box(size_t x, size_t y, size_t width, size_t height);
 
 // Moves the cursor to a specific location.
-void terminal_move(int x, int y);
+void terminal_move(size_t x, size_t y);
 
 // Writes a 32-bit number to the terminal in decimal.
 void terminal_write_dec(uint32_t data);

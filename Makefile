@@ -7,7 +7,7 @@ XORRISO = xorriso
 QEMU = qemu-system-x86_64
 BOCHS = bochs
 
-CFLAGS = -Wall -O2 -c -ffreestanding -Ikernel/inc/
+CFLAGS = -Wall -Wextra -Wno-int-conversion -Werror -O2 -c -ffreestanding -Ikernel/inc/
 LDFLAGS = -n -T linker.ld
 
 ISO_DIR = isofiles/boot

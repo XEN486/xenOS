@@ -1,4 +1,5 @@
 #include <terminal.h>
+#include <ports.h>
 #include <memory.h>
 #include <string.h>
 
@@ -133,7 +134,7 @@ void terminal_init() {
     terminal_update_cursor();
 }
 
-void terminal_box(int x, int y, int width, int height) {
+void terminal_box(size_t x, size_t y, size_t width, size_t height) {
     terminal_move(x, y);
     
     terminal_put(TL_CORNER);
@@ -157,7 +158,7 @@ void terminal_box(int x, int y, int width, int height) {
     terminal_put(BR_CORNER);
 }
 
-void terminal_move(int x, int y) {
+void terminal_move(size_t x, size_t y) {
     terminal_column = x;
     terminal_row = y;
     terminal_update_cursor();

@@ -1,10 +1,12 @@
 #include <timer.h>
 #include <idt.h>
+#include <ports.h>
 
 uint32_t tick = 0;
 
 static void timer_callback(int_registers_t* regs) {
     tick++;
+    (void)regs;
 }
 
 void timer_init(uint32_t freq) {

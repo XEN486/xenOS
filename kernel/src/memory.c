@@ -19,7 +19,7 @@ uint32_t kmalloc_i(size_t size, bool align, uint32_t* phys) {
 		void* addr = heap_alloc(size, align, kernel_heap);
 		if (phys != NULL) {
 			page_t* page = paging_get_page((uint32_t)addr, false, kernel_directory);
-			*phys = page->frame * 0x1000 + (uint32_t)addr & 0xFFF;
+			*phys = (page->frame * 0x1000) + ((uint32_t)addr & 0xFFF);
 		}
 
 		return (uint32_t)addr;

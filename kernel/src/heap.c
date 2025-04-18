@@ -15,7 +15,7 @@ static int32_t find_smallest_hole(size_t size, bool page_align, heap_t* heap) {
             uint32_t location = (uint32_t)header;
             int32_t offset = 0;
 
-            if ((location+sizeof(header_t) & 0xFFFFF000) != 0)
+            if (((location+sizeof(header_t)) & 0xFFFFF000) != 0)
                 offset = 0x1000 - (location+sizeof(header_t)) % 0x1000;
 
             int32_t hole_size = (int32_t)header->size - offset;
@@ -123,8 +123,8 @@ void* heap_alloc(size_t size, bool page_align, heap_t* heap) {
         uint32_t new_length = heap->end_address-heap->start_address;
 
         iterator = 0;
-        size_t idx = -1; uint32_t value = 0x0;
-        while (iterator < heap->index.size) {
+        int32_t idx = -1; uint32_t value = 0x0;
+        while (iterator < (int32_t)heap->index.size) {
             uint32_t tmp = (uint32_t)lookup_ordered_array(iterator, &heap->index);
             if (tmp > value) {
                 value = tmp;

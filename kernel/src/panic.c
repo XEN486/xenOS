@@ -1,8 +1,6 @@
 #include <panic.h>
 #include <terminal.h>
 
-extern void hang();
-
 void panic(const char* error, const char* description, const char* file, int line, panic_handler_t handler) {
     uint32_t eax, ebx, ecx, edx, esi, edi, ebp, esp;
     
@@ -21,68 +19,68 @@ void panic(const char* error, const char* description, const char* file, int lin
     );
 
     // clear the screen
-    //terminal_clear();
+    terminal_clear();
 
-    // "Error: "
+    // "Error: ".
     terminal_set_colour(VGA_COLOUR(RED, BLACK));
     terminal_write("Error:       ");
 
-    // show error
+    // show error.
     terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
     terminal_write(error);
 
-    // "Description: "
+    // "Description: ".
     terminal_set_colour(VGA_COLOUR(RED, BLACK));
     terminal_write("\nDescription: ");
 
-    // show description
+    // show description.
     terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
     terminal_write(description);
 
-    // "Where: "
+    // "Where: ".
     terminal_set_colour(VGA_COLOUR(RED, BLACK));
     terminal_write("\nWhere:       ");
 
-    // file(line)
+    // file(line).
     terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
     terminal_write(file);
     terminal_write("(");
     terminal_write_dec(line);
     terminal_write(").");
 
-    // EAX
+    // EAX.
     terminal_write("\n\n        EAX: ");
     terminal_write_hex(eax);
 
-    // EBX
+    // EBX.
     terminal_write(" EBX: ");
     terminal_write_hex(ebx);
 
-    // ECX
+    // ECX.
     terminal_write(" ECX: ");
     terminal_write_hex(ecx);
 
-    // EDX
+    // EDX.
     terminal_write(" EDX: ");
     terminal_write_hex(edx);
 
-    // ESI
+    // ESI.
     terminal_write("\n        ESI: ");
     terminal_write_hex(esi);
 
-    // EDI
+    // EDI.
     terminal_write(" EDI: ");
     terminal_write_hex(edi);
 
-    // EBP
+    // EBP.
     terminal_write(" EBP: ");
     terminal_write_hex(ebp);
     
-    // ESP
+    // ESP.
     terminal_write(" ESP: ");
     terminal_write_hex(esp);
 
-    // call any additional handlers
+    // call any additional handlers.
     if (handler != NULL) {
         terminal_set_colour(VGA_COLOUR(RED, BLACK));
         terminal_write("\n\nAdditional information: ");
@@ -91,40 +89,40 @@ void panic(const char* error, const char* description, const char* file, int lin
         handler();
     }
 
-    // hang
-    hang();
+    // hang.
+    hang(true);
 }
 
 void notify(const char* error, const char* description, panic_handler_t handler) {
-    // save the current colour
+    // save the current colour.
     uint8_t old_colour = terminal_get_colour();
 
-    // draw a box
+    // draw a box.
     terminal_set_colour(VGA_COLOUR(LIGHT_BLUE, BLACK));
-    terminal_box(0, 0, 80, 2);
+    terminal_box(0, 0, TERM_WIDTH, 2);
 
-    // "Kernel Notification: "
+    // "Kernel Notification: ".
     terminal_set_colour(VGA_COLOUR(LIGHT_CYAN, BLACK));
     terminal_move(1, 1);
     terminal_write("Kernel Notification: ");
 
-    // show notification
+    // show notification.
     terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
     terminal_write(error);
 
-    // "Description: "
+    // "Description: ".
     terminal_set_colour(VGA_COLOUR(LIGHT_CYAN, BLACK));
     terminal_move(1, 2);
     terminal_write("Description: ");
     
-    // show description
+    // show description.
     terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
     terminal_write(description);
 
-    // move outside of the box
+    // move outside of the box.
     terminal_move(0, 4);
 
-    // call any additional handlers
+    // call any additional handlers.
     if (handler != NULL) {
         terminal_set_colour(VGA_COLOUR(LIGHT_CYAN, BLACK));
         terminal_write("Additional information: ");

@@ -1,5 +1,6 @@
 #include <keyboard.h>
 #include <idt.h>
+#include <ports.h>
 
 key_handler_t key_handlers[256];
 uint16_t key_handler_amount = 0;
@@ -90,6 +91,8 @@ static void keyboard_callback(int_registers_t* regs) {
     for (uint16_t i = 0; i < key_handler_amount; i++) {
         key_handlers[i](scancode, get_ascii(scancode), get_modifiers());
     }
+
+    (void)regs;
 }
 
 void register_key_handler(key_handler_t handler) {

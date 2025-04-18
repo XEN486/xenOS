@@ -4,12 +4,6 @@
 [section .text]
 
 [bits 32]
-; check if we booted using multiboot2.
-check_multiboot:
-	cmp eax, 0x36d76289
-	jne hang
-	ret
-
 _start:
 	; set up the stack.
 	mov esp, stack_top
@@ -22,8 +16,8 @@ _start:
 	cli
 	
 	; push multiboot structure.
-	push ebx
 	push eax
+	push ebx
 	
 	; jump to kernel C code.
 	jmp kmain

@@ -39,6 +39,7 @@ void clear_frame(uint32_t frame_addr) {
 }
 
 // tests a bit in the frames bitset.
+/*
 static uint32_t test_frame(uint32_t frame_addr) {
     uint32_t frame = frame_addr / 0x1000;
     uint32_t idx = INDEX_FROM_BIT(frame);
@@ -46,6 +47,7 @@ static uint32_t test_frame(uint32_t frame_addr) {
 
     return (frames[idx] & (0x1 << off));
 }
+*/
 
 // finds the first free frame.
 static uint32_t first_free_frame() {
@@ -128,6 +130,7 @@ void page_fault_panic_handler() {
 
 void paging_page_fault(int_registers_t* regs) {
     PANIC("Page fault", "The faulting address is written in \"Additional Information\".", page_fault_panic_handler);
+    (void)regs;
 }
 
 void paging_init() {

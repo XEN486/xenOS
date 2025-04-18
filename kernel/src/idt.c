@@ -1,6 +1,7 @@
 #include <idt.h>
 #include <terminal.h>
 #include <memory.h>
+#include <ports.h>
 
 extern void idt_apply(uint32_t);
 
@@ -15,7 +16,7 @@ void isr_handler(int_registers_t* regs) {
     } else {
         terminal_clear();
         terminal_write("!!! UNHANDLED INTERRUPT !!!");
-        while (true) {}
+        hang(true);
     }
 }
 
