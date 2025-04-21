@@ -4,10 +4,10 @@ void hang(bool halt) {
 	if (!halt)
 		while (true) {}
 
-halt:
+hlt:
 	// clear interrupts and halt.
 	__asm__ volatile("cli; hlt");
 
 	// repeat again if we wake up somehow.
-	goto halt;
+	goto hlt;
 }
