@@ -36,10 +36,6 @@ void kmain(unsigned long magic, unsigned long addr) {
 	keyboard_init();
 	register_key_handler(print_key);
 
-	//volatile uint32_t* unmapped = (uint32_t*)0xdeadbeef;
-	//terminal_put(*unmapped);
-
 	hang(false);
-	(void)magic;
 	(void)addr;
 }
