@@ -76,11 +76,10 @@ static uint8_t get_ascii(uint8_t scancode) {
         caps_lock = !caps_lock;
     }
 
-    else if (ascii) {
+    // if we did not hit any modifier keys, then return the character.
+    else {
         return ascii;
     }
-
-    return 0;
 }
 
 static inline uint8_t get_modifiers() {
