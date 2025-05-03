@@ -3,7 +3,7 @@
 #include <ports.h>
 
 key_handler_t key_handlers[256];
-uint16_t key_handler_amount = 0;
+size_t key_handler_amount = 0;
 
 #define SHIFT 0xFF
 #define CAPS 0xFE
@@ -91,8 +91,8 @@ static void keyboard_callback(int_registers_t* regs) {
     // read the current scancode.
     uint8_t scancode = inb(0x60);
 
-    // call all the registered handlers
-    for (uint16_t i = 0; i < key_handler_amount; i++) {
+    // call all the registered handlers.
+    for (size_t i = 0; i < key_handler_amount; i++) {
         key_handlers[i](scancode, get_ascii(scancode), get_modifiers());
     }
 
