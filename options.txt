@@ -1,0 +1,17 @@
+A list of options you can compile the kernel with:
+
+NO_NOTIFY
+    -> Disables kernel notifications.
+    -> Recommended. Should only be disabled for debugging.
+
+NO_PANIC
+    -> Disables kernel panics.
+    -> Not recommended.
+
+ASSERT_PANIC
+    -> Makes assertions panic instead of showing a notification.
+    -> Not recommended.
+
+VERBOSE_DEBUG
+    -> Adds extra debugging information.
+    -> Not recommended, unless you are making changes to the kernel.

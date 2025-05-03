@@ -3,22 +3,25 @@
 
 #include <common.h>
 
+// Void pointer type.
 typedef void* type_t;
-typedef bool (*lessthan_predicate_t)(type_t, type_t);
 
+// Less-than predicate type.
+typedef bool (*less_than_predicate_t)(type_t, type_t);
+
+// Ordered array structure.
 typedef struct {
     type_t* array;
     size_t size;
     size_t max_size;
-    lessthan_predicate_t lessthan;
+    less_than_predicate_t less_than;
 } ordered_array_t;
 
-// Standard less-than predicate.
-bool std_lessthan_predicate(type_t a, type_t b);
+// Creates an ordered array. Pass `NULL` to `less_than` if you want to use the default predicate.
+ordered_array_t create_ordered_array(size_t max_size, less_than_predicate_t less_than);
 
-// Creates an ordered array.
-ordered_array_t create_ordered_array(size_t max_size, lessthan_predicate_t lessthan);
-ordered_array_t place_ordered_array(void* addr, size_t max_size, lessthan_predicate_t lessthan);
+// Places an ordered array at the address `addr`.
+ordered_array_t place_ordered_array(void* addr, size_t max_size, less_than_predicate_t less_than);
 
 // Destroys an ordered array.
 void destroy_ordered_array(ordered_array_t* array);
@@ -26,10 +29,10 @@ void destroy_ordered_array(ordered_array_t* array);
 // Adds an item to an ordered array.
 void insert_ordered_array(type_t item, ordered_array_t* array);
 
-// Finds the item at index i.
+// Finds the item at index `i`.
 type_t lookup_ordered_array(size_t i, ordered_array_t* array);
 
-// Deletes the item at location i from the array.
+// Deletes the item at location `i` from the array.
 void remove_ordered_array(size_t i, ordered_array_t* array);
 
 #endif

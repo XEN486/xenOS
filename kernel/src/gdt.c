@@ -19,10 +19,11 @@ static void gdt_set_entry(size_t num, uint32_t base, uint32_t limit, uint8_t acc
 }
 
 void gdt_init() {
+    // set GDT limit and base.
     gdt_ptr.limit = (sizeof(gdt_entry_t) * 5) - 1;
     gdt_ptr.base = (uint32_t)&gdt_entries;
 
-    // set the GDT entries.
+    // set GDT entries.
     gdt_set_entry(0, 0x00000000, 0x00000000, 0x00, 0x00); // null segment
     gdt_set_entry(1, 0x00000000, 0xFFFFFFFF, 0x9A, 0xCF); // code segment
     gdt_set_entry(2, 0x00000000, 0xFFFFFFFF, 0x92, 0xCF); // data segment

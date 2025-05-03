@@ -6,36 +6,39 @@
 #include <timer.h>
 #include <paging.h>
 #include <keyboard.h>
+#include <panic.h>
+#include <memory.h>
 
 static void print_key(uint8_t scancode, uint8_t ascii, uint8_t modifiers) {
-	//terminal_write_hex(scancode);
-	if (ascii != 0 && (modifiers & CTRL_PRESSED) == 0) {
-		terminal_put(ascii);
-	}
+    //terminal_write_hex(scancode);
+    if (ascii != 0 && (modifiers & CTRL_PRESSED) == 0) {
+        terminal_put(ascii);
+    }
 
-	(void)scancode;
+    (void)scancode;
 }
 
 static void check_magic(unsigned long magic) {
-	if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
-		terminal_write("invalid magic number: ");
-		terminal_write_hex(magic);
-		hang(true);
-	}
+    if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
+        terminal_write("invalid magic number: ");
+        terminal_write_hex(magic);
+        hang(true);
+    }
 }
 
 void kmain(unsigned long magic, unsigned long addr) {
-	terminal_init();
-	check_magic(magic);
+    terminal_init();
+    check_magic(magic);
 
-	gdt_init();
-	idt_init();
-	timer_init(50);
-	paging_init();
+    gdt_init();
+    idt_init();
+    timer_init(100);
+    paging_init();
+    keyboard_init();
+    register_key_handler(print_key);
 
-	keyboard_init();
-	register_key_handler(print_key);
+    notify("Test", "yes testing!!!!", NULL);
 
-	hang(false);
-	(void)addr;
+    hang(false);
+    (void)addr;
 }

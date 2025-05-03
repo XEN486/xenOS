@@ -1,7 +1,9 @@
 #include <panic.h>
 #include <terminal.h>
+#include <string.h>
 
-void panic(const char* error, const char* description, const char* file, int line, panic_handler_t handler) {
+void panic(const char* error, const char* description, panic_handler_t handler, const char* file, int line) {
+#ifndef NO_PANIC
     uint32_t eax, ebx, ecx, edx, esi, edi, ebp, esp;
     
     // read all the current registers
@@ -91,9 +93,18 @@ void panic(const char* error, const char* description, const char* file, int lin
 
     // hang.
     hang(true);
+#endif
 }
 
-void notify(const char* error, const char* description, panic_handler_t handler) {
+void notify(const char* error, char* description, panic_handler_t handler) {
+#ifndef NO_NOTIFY
+    // truncate the description if necessary.
+    bool truncated = false;
+    if (strlen(description) > TERM_WIDTH - 16) {
+        description[TERM_WIDTH - 16] = '\0';
+        truncated = true;
+    }
+
     // save the current colour.
     uint8_t old_colour = terminal_get_colour();
 
@@ -106,7 +117,7 @@ void notify(const char* error, const char* description, panic_handler_t handler)
     terminal_move(1, 1);
     terminal_write("Kernel Notification: ");
 
-    // show notification.
+    // write notification.
     terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
     terminal_write(error);
 
@@ -115,7 +126,7 @@ void notify(const char* error, const char* description, panic_handler_t handler)
     terminal_move(1, 2);
     terminal_write("Description: ");
     
-    // show description.
+    // write description.
     terminal_set_colour(VGA_COLOUR(WHITE, BLACK));
     terminal_write(description);
 
@@ -132,12 +143,25 @@ void notify(const char* error, const char* description, panic_handler_t handler)
         terminal_put('\n');
     }
 
+#ifdef VERBOSE_DEBUG
+    if (truncated) {
+        terminal_write("Notification description has been truncated!\n");
+    }
+#else
+    (void)truncated;
+#endif
+
     // return the terminal colour.
     terminal_set_colour(old_colour);
+#endif
 }
 
-void assert(bool condition, const char* error, const char* description) {
+void assert(bool condition, const char* error, char* description) {
     if (!condition) {
+#ifndef NO_NOTIFY
         notify(error, description, NULL);
+#elif defined(ASSERT_PANIC)
+        PANIC(error, description, NULL);
+#endif
     }
 }

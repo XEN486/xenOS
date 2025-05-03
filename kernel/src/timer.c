@@ -2,7 +2,7 @@
 #include <idt.h>
 #include <ports.h>
 
-uint32_t tick = 0;
+size_t tick = 0;
 
 static void timer_callback(int_registers_t* regs) {
     tick++;

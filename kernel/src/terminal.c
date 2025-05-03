@@ -55,8 +55,8 @@ void terminal_clear() {
         terminal_write_entry_index(' ', terminal_colour, i);
     }
 
-	terminal_column = 0;
-	terminal_row = 0;
+    terminal_column = 0;
+    terminal_row = 0;
 }
 
 uint8_t terminal_get_colour() {
@@ -68,38 +68,38 @@ void terminal_set_colour(uint8_t colour) {
 }
 
 bool terminal_handle_control(uint8_t c) {
-	if (c == '\n') {
-		terminal_column = 0;
-		terminal_row += 1;
-	} else if (c == '\b') {
-		if (terminal_column == 0) {
-			return true;
-		}
+    if (c == '\n') {
+        terminal_column = 0;
+        terminal_row += 1;
+    } else if (c == '\b') {
+        if (terminal_column == 0) {
+            return true;
+        }
 
-		terminal_column -= 1;
-		terminal_write_entry(' ', terminal_colour, terminal_column, terminal_row);
-	} else if (c == '\r') {
-		terminal_column = 0;
-	} else if (c == '\t') {
-		terminal_column = (terminal_column + 4) & ~(4-1);
-	} else {
-		return false;
-	}
+        terminal_column -= 1;
+        terminal_write_entry(' ', terminal_colour, terminal_column, terminal_row);
+    } else if (c == '\r') {
+        terminal_column = 0;
+    } else if (c == '\t') {
+        terminal_column = (terminal_column + 4) & ~(4-1);
+    } else {
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 void terminal_put(uint8_t c) {
     if (!terminal_handle_control(c)) {
-		terminal_write_entry(c, terminal_colour, terminal_column, terminal_row);
+        terminal_write_entry(c, terminal_colour, terminal_column, terminal_row);
 
-		if (++terminal_column == TERM_WIDTH) {
-			terminal_column = 0;
-			if (++terminal_row == TERM_HEIGHT) {
-				terminal_scroll();
-			}
-		}
-	}
+        if (++terminal_column == TERM_WIDTH) {
+            terminal_column = 0;
+            if (++terminal_row == TERM_HEIGHT) {
+                terminal_scroll();
+            }
+        }
+    }
 
     terminal_scroll();
     terminal_update_cursor();
@@ -117,7 +117,7 @@ void terminal_write(const char* data) {
 
 void terminal_write_hex(uint32_t data) {
     char hex_str[9];
-	terminal_write("0x");
+    terminal_write("0x");
 
     for (int i = 7; i >= 0; i--) {
         hex_str[i] = "0123456789ABCDEF"[data & 0xF];

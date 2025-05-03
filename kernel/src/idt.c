@@ -2,6 +2,7 @@
 #include <terminal.h>
 #include <memory.h>
 #include <ports.h>
+#include <panic.h>
 
 extern void idt_apply(uint32_t);
 
@@ -11,12 +12,14 @@ idt_ptr_t idt_ptr;
 isr_t handlers[256];
 
 void isr_handler(int_registers_t* regs) {
-	if (handlers[regs->int_no] != 0) {
+    // call the assigned interrupt handler if it exists.
+    if (handlers[regs->int_no] != NULL) {
         handlers[regs->int_no](regs);
-    } else {
-        terminal_clear();
-        terminal_write("!!! UNHANDLED INTERRUPT !!!");
-        hang(true);
+    }
+    
+    // show a kernel notification
+    else {
+        notify("Unhandled Interrupt", "An interrupt without an assigned handler has been triggered.", NULL);
     }
 }
 

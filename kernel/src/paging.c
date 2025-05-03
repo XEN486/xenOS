@@ -174,7 +174,7 @@ void paging_init() {
     paging_switch_directory(kernel_directory);
     enable_paging();
 
-    // create the kernel heap
+    // create the kernel heap.
     kernel_heap = heap_create(HEAP_START, HEAP_START + HEAP_INITIAL_SIZE, 0xCFFFF000, false, false);
 }
 

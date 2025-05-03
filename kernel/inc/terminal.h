@@ -3,34 +3,34 @@
 
 #include <common.h>
 
-// Macro to create a VGA colour entry from two VGA colours.
+// Creates a VGA colour entry.
 #define VGA_COLOUR(fg, bg) fg | (bg << 4)
 
-// VGA colour
+// VGA colour enum.
 typedef enum {
-	BLACK = 0,
-	BLUE = 1,
-	GREEN = 2,
-	CYAN = 3,
-	RED = 4,
-	MAGENTA = 5,
-	BROWN = 6,
-	LIGHT_GREY = 7,
-	DARK_GREY = 8,
-	LIGHT_BLUE = 9,
-	LIGHT_GREEN = 10,
-	LIGHT_CYAN = 11,
-	LIGHT_RED = 12,
-	LIGHT_MAGENTA = 13,
-	LIGHT_BROWN = 14,
-	WHITE = 15,
+    BLACK = 0,
+    BLUE,
+    GREEN,
+    CYAN,
+    RED,
+    MAGENTA,
+    BROWN,
+    LIGHT_GREY,
+    DARK_GREY,
+    LIGHT_BLUE,
+    LIGHT_GREEN,
+    LIGHT_CYAN,
+    LIGHT_RED,
+    LIGHT_MAGENTA,
+    LIGHT_BROWN,
+    WHITE,
 } vga_colour_t;
 
-// Terminal width
-static const size_t TERM_WIDTH = 80;
+// Terminal width.
+#define TERM_WIDTH 80
 
-// Terminal height
-static const size_t TERM_HEIGHT = 25;
+// Terminal height.
+#define TERM_HEIGHT 25
 
 // Initializes the terminal.
 void terminal_init();
