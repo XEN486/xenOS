@@ -37,8 +37,6 @@ void kmain(unsigned long magic, unsigned long addr) {
     keyboard_init();
     register_key_handler(print_key);
 
-    notify("Test", "yes testing!!!!", NULL);
-
     hang(false);
     (void)addr;
 }

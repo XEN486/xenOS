@@ -64,22 +64,23 @@ static uint8_t get_ascii(uint8_t scancode) {
     // set SHIFT state.
     if (ascii == SHIFT) {
         shift_pressed = true;
+        ascii = 0;
     }
     
     // set CTRL state.
     else if (ascii == CTRL) {
         ctrl_pressed = true;
+        ascii = 0;
     }
     
     // set CAPS state.
     else if (ascii == CAPS) {
         caps_lock = !caps_lock;
+        ascii = 0;
     }
 
     // if we did not hit any modifier keys, then return the character.
-    else {
-        return ascii;
-    }
+    return ascii;
 }
 
 static inline uint8_t get_modifiers() {
